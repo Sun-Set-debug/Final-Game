@@ -14,6 +14,7 @@ public class Player extends Person{
     int hp;
     int atk;
     int def;
+    boolean death = false;
     static int gold = 0;
     static int keyWood = 0;
     static int keyStone = 0;
@@ -38,4 +39,5 @@ public class Player extends Person{
             }
         }
     }
+    
 }

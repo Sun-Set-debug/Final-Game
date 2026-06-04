@@ -16,8 +16,9 @@ public class Person {
     int y;
     String person;
     PImage image;
-    private PApplet app;
-    private int width, height;
+    PApplet app;
+    int width;
+    int height;
     public Person(int x, int y, String person, PApplet app, String imagePath){
         this.x = x;
         this.y = y;
@@ -29,5 +30,9 @@ public class Person {
     }
     public void draw(){
         app.image(image,x,y);
+    }
+    public boolean isClicked(int mouseX, int mouseY){
+        return mouseX >= x && mouseX <= x + image.pixelWidth &&
+           mouseY >= y && mouseY <= y + image.pixelHeight;
     }
 }
