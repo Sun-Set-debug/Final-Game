@@ -22,4 +22,8 @@ public class NPC extends Person{
         app.text(person +  ':', x, y-50);
         app.text(dialogue, x, y-30);
     }
+    public void setSite(int x, int y){
+        this.x = x * 48;
+        this.y = y * 48;
+    }
 }

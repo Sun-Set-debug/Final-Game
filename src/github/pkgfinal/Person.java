@@ -20,8 +20,8 @@ public class Person {
     int width;
     int height;
     public Person(int x, int y, String person, PApplet app, String imagePath){
-        this.x = x;
-        this.y = y;
+        this.x = x * 48;
+        this.y = y * 48;
         this.person = person;
         this.app = app;
         this.image = app.loadImage(imagePath);
@@ -35,4 +35,5 @@ public class Person {
         return mouseX >= x && mouseX <= x + image.pixelWidth &&
            mouseY >= y && mouseY <= y + image.pixelHeight;
     }
+    
 }

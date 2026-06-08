@@ -17,10 +17,11 @@ public class MapItem {
     String person;
     PImage image;
     private PApplet app;
-    private int width, height;
+    int width;
+    int height;
     public MapItem(int x, int y, String person, PApplet app, String imagePath){
-        this.x = x;
-        this.y = y;
+        this.x = x * 48;
+        this.y = y * 48;
         this.person = person;
         this.app = app;
         this.image = app.loadImage(imagePath);
@@ -29,5 +30,9 @@ public class MapItem {
     }
     public void draw(){
         app.image(image,x,y);
+    }
+    public void setSite(int x, int y){
+        this.x = x * 48;
+        this.y = y * 48;
     }
 }

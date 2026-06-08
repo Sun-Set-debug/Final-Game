@@ -17,6 +17,7 @@ public class Monster extends Person{
     private int reward;
     boolean defeated;
     boolean showInfo;
+    int damage;
     public Monster(int x, int y, String person, PApplet app, String imagePath, int hp, int atk, int def, int reward){
         super(x,y,person,app,imagePath);
         this.hp = hp;
@@ -26,14 +27,20 @@ public class Monster extends Person{
         this.defeated = false;
         this.showInfo = false;
     }
-    public void fight(Player player){
-        while (hp > 0){
-            hp -= player.atk - def;
-            if (hp <= 0){
+    public void damage(Player player){
+        damage = 0;
+        int health = hp;
+        while (health > 0){
+            health -= Math.max(0,player.atk - def);
+            if (player.atk <= def){
+                damage = 999999;
                 break;
             }
-            player.hp -= atk - player.def;
+            damage += Math.max(0,atk - player.def);
         }
+    }
+    public void fight(Player player){
+        player.hp -= damage;
         Player.gold += reward;
         defeated = true;
     }
@@ -43,7 +50,6 @@ public class Monster extends Person{
         boolean isRightOfOtherLeft = x + width > other.x;
         boolean isAboveOtherBottom = y < other.y + other.height;
         boolean isBelowOtherTop = y + height > other.y;
-
         return isLeftOfOtherRight && isRightOfOtherLeft 
           && isAboveOtherBottom && isBelowOtherTop;
     }
@@ -51,5 +57,10 @@ public class Monster extends Person{
         app.fill(0);
         app.text("Hp: " + hp + ", Atk: " + atk, x + 50, y + 20);
         app.text("Gold: " + reward + ", Def: " + def, x + 50, y + 40);
+        app.text("Damage: " + damage, x + 50, y + 60);
+    }
+    public void setSite(int x, int y){
+        this.x = x * 48;
+        this.y = y * 48;
     }
 }

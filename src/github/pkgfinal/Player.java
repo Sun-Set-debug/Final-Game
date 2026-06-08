@@ -25,19 +25,13 @@ public class Player extends Person{
         this.def = def;
     }
     public void move(int dx, int dy){
-        x += dx;
-        y += dy;
+        x += dx * 48;
+        y += dy * 48;
     }
-    public void pickUp(Resource item){
-        switch (item.type) {
-            case "hp" -> hp += item.value;
-            case "atk" -> atk += item.value;
-            case "def" -> def += item.value;
-            case "keyWood" -> keyWood += item.value;
-            case "keyStone" -> keyStone += item.value;
-            default -> {
-            }
-        }
+    public int getX(){
+        return x;
     }
-    
+    public int getY(){
+        return y;
+    }
 }
