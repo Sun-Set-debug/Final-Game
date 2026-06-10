@@ -35,4 +35,10 @@ public class NPC extends Person{
         return isLeftOfOtherRight && isRightOfOtherLeft 
           && isAboveOtherBottom && isBelowOtherTop;
     }
-}
+    public int getX(){
+        return x;
+    }
+    public int getY()
+    {
+        return y;
+    }}

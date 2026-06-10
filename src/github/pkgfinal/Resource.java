@@ -28,6 +28,7 @@ public class Resource extends MapItem{
             case "def" -> player.def += value;
             case "keyWood" -> Player.keyWood += value;
             case "keyStone" -> Player.keyStone += value;
+            case "keyGold" -> Player.keyGold += value;
             default -> {
             }
         }

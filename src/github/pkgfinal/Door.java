@@ -28,20 +28,20 @@ public class Door extends MapItem{
     }
     public void open(){
         switch (doorType) {
-            case "wood" -> {
-                if (Player.keyWood > 0){
+            case "Wood" -> {
+                if (Player.keyWood > 0 && !passable){
                     Player.keyWood -= 1;
                     passable = true;
                 }
             }
-            case "stone" -> {
-                if(Player.keyStone > 0){
+            case "Stone" -> {
+                if(Player.keyStone > 0 && !passable){
                     Player.keyStone -= 1;
                     passable = true;
                 }
             }
             case "Gold" -> {
-                if(Player.keyGold > 0){
+                if(Player.keyGold > 0 && !passable){
                     Player.keyGold -=1;
                     passable = true;
                 }
