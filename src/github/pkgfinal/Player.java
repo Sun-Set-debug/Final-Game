@@ -11,13 +11,13 @@ import processing.core.PApplet;
  * @author fuche
  */
 public class Player extends Person{
-    int hp;
+    int hp = 1;
     int atk;
     int def;
-    boolean death = false;
     static int gold = 0;
     static int keyWood = 0;
     static int keyStone = 0;
+    static int keyGold = 0;
     public Player(int x, int y, String person, PApplet app, String imagePath, int hp, int atk, int def){
         super(x,y,person,app,imagePath);
         this.hp = hp;
@@ -33,5 +33,9 @@ public class Player extends Person{
     }
     public int getY(){
         return y;
+    }
+    public void setSite(int dx, int dy){
+        this.x = dx * 48 + 144;
+        this.y = dy * 48;
     }
 }

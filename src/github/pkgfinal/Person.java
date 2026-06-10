@@ -20,7 +20,7 @@ public class Person {
     int width;
     int height;
     public Person(int x, int y, String person, PApplet app, String imagePath){
-        this.x = x * 48;
+        this.x = x * 48 + 144;
         this.y = y * 48;
         this.person = person;
         this.app = app;
@@ -35,5 +35,13 @@ public class Person {
         return mouseX >= x && mouseX <= x + image.pixelWidth &&
            mouseY >= y && mouseY <= y + image.pixelHeight;
     }
-    
+    public boolean isCollidingWithR(Person other) {
+        // Check if the bounding boxes of the two persons intersect
+        boolean isLeftOfOtherRight = x < other.x + other.width;
+        boolean isRightOfOtherLeft = x + width > other.x;
+        boolean isAboveOtherBottom = y < other.y + other.height;
+        boolean isBelowOtherTop = y + height > other.y;
+        return isLeftOfOtherRight && isRightOfOtherLeft 
+          && isAboveOtherBottom && isBelowOtherTop;
+    }
 }

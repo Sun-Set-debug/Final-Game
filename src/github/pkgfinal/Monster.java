@@ -15,9 +15,11 @@ public class Monster extends Person{
     private int atk;
     private int def;
     private int reward;
+    boolean fight = true;
     boolean defeated;
     boolean showInfo;
     int damage;
+    String damageExt;
     public Monster(int x, int y, String person, PApplet app, String imagePath, int hp, int atk, int def, int reward){
         super(x,y,person,app,imagePath);
         this.hp = hp;
@@ -30,18 +32,26 @@ public class Monster extends Person{
     public void damage(Player player){
         damage = 0;
         int health = hp;
-        while (health > 0){
-            health -= Math.max(0,player.atk - def);
-            if (player.atk <= def){
-                damage = 999999;
-                break;
+        if (player.atk <= def){
+            fight = false;
+            damageExt = "???";
+        }else{
+            fight = true;
+            while (health > 0){
+                health -= Math.max(0,player.atk - def);
+                if (health<=0) break;
+                damage += Math.max(0,atk - player.def);
             }
-            damage += Math.max(0,atk - player.def);
+            damageExt = damage + "";
         }
     }
     public void fight(Player player){
-        player.hp -= damage;
-        Player.gold += reward;
+        if (fight){
+            player.hp -= damage;
+            Player.gold += reward;
+        }else{
+            player.hp = -9999;
+        }
         defeated = true;
     }
     public boolean isCollidingWithR(Person other) {
@@ -55,9 +65,11 @@ public class Monster extends Person{
     }
     public void display(){
         app.fill(0);
-        app.text("Hp: " + hp + ", Atk: " + atk, x + 50, y + 20);
-        app.text("Gold: " + reward + ", Def: " + def, x + 50, y + 40);
-        app.text("Damage: " + damage, x + 50, y + 60);
+        app.text(hp, 90, 405);
+        app.text(atk, 90, 430);
+        app.text(def, 90, 455);
+        app.text(reward, 100, 480);
+        app.text(damageExt, 100, 505);
     }
     public void setSite(int x, int y){
         this.x = x * 48;

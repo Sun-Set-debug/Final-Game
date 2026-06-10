@@ -13,25 +13,42 @@ import processing.core.PApplet;
 public class Door extends MapItem{
     String doorType;
     boolean passable = false;
+    int sx, sy, mapChange;
     public Door(int x, int y, String person, PApplet app, String imagePath, String doorType){
         super(x,y,person,app,imagePath);
         this.doorType = doorType;
     }
-    public boolean open(Player player){
-        if (doorType.equals("wood")){
-            if (player.keyWood > 0){
-                player.keyWood -= 1;
-                passable = true;
-                return true;
+    public Door(int x, int y, String person, PApplet app, String imagePath, int sx, int sy, int mapChange){
+        super(x,y,person,app,imagePath);
+        doorType = "nextMap";
+        passable = true;
+        this.sx = sx;
+        this.sy = sy;
+        this.mapChange = mapChange;
+    }
+    public void open(){
+        switch (doorType) {
+            case "wood" -> {
+                if (Player.keyWood > 0){
+                    Player.keyWood -= 1;
+                    passable = true;
+                }
             }
-        }else if (doorType.equals("stone")){
-            if(player.keyStone > 0){
-                player.keyStone -= 1;
-                passable = true;
-                return true;
+            case "stone" -> {
+                if(Player.keyStone > 0){
+                    Player.keyStone -= 1;
+                    passable = true;
+                }
+            }
+            case "Gold" -> {
+                if(Player.keyGold > 0){
+                    Player.keyGold -=1;
+                    passable = true;
+                }
+            }
+            default -> {
             }
         }
-        return false;
     }
     public boolean isCollidingWithR(Person other) {
         // Check if the bounding boxes of the two persons intersect

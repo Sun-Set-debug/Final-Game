@@ -20,7 +20,7 @@ public class MapItem {
     int width;
     int height;
     public MapItem(int x, int y, String person, PApplet app, String imagePath){
-        this.x = x * 48;
+        this.x = x * 48 + 144;
         this.y = y * 48;
         this.person = person;
         this.app = app;

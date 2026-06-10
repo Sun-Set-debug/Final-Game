@@ -18,12 +18,21 @@ public class NPC extends Person{
         this.speak = false;
     }
     public void speak(PApplet app){
+        app.fill(255);
+        app.stroke(0);
+        app.strokeWeight(1);
+        app.rect(200, 432, 416, 96, 10);
         app.fill(0);
-        app.text(person +  ':', x, y-50);
-        app.text(dialogue, x, y-30);
+        app.text(person +  ':', 220, 455);
+        app.text(dialogue, 220, 477);
     }
-    public void setSite(int x, int y){
-        this.x = x * 48;
-        this.y = y * 48;
+    public boolean isCollidingWithR(Person other) {
+        // Check if the bounding boxes of the two persons intersect
+        boolean isLeftOfOtherRight = x < other.x + other.width;
+        boolean isRightOfOtherLeft = x + width > other.x;
+        boolean isAboveOtherBottom = y < other.y + other.height;
+        boolean isBelowOtherTop = y + height > other.y;
+        return isLeftOfOtherRight && isRightOfOtherLeft 
+          && isAboveOtherBottom && isBelowOtherTop;
     }
 }
