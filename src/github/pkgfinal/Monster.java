@@ -11,7 +11,7 @@ import processing.core.PApplet;
  * @author fuche
  */
 public class Monster extends Person{
-    private int hp;
+    int hp;
     private int atk;
     private int def;
     private int reward;

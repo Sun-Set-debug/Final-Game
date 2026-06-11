@@ -99,19 +99,18 @@ public class MySketch extends PApplet{
         }
         if (map >= 0){
             shop();
+            information();
             if (!shop){
                 drawMap();
                 userMove();
             }else{
                 drawShop();
             }
-            information();
         }
         if(map == 3 &&
             monsters[3][0].defeated &&
             endingState == 0){
             endingState = 1;
-            map = -3;
          }
         switch (endingState) {
             case 1 -> drawEndingDialogue();
@@ -135,15 +134,32 @@ public class MySketch extends PApplet{
                 }
             }
             for(Monster m : monsters[map]){
-                if (m != null){
+                if (m != null && !m.defeated){
                     m.showInfo = m.isClicked(mouseX, mouseY);
                 }
             }
         }
-        if (map == 3 && endingState == 1){
-            if (kill.isClicked(mouseX, mouseY))endingState = 3;
-            else if(spare.isClicked(mouseX, mouseY))endingState = 2;
+        if (endingState == 1){
+            System.out.println("dialog active");
+            if (kill.isClicked(mouseX, mouseY)){endingState = 3;
+            map = -3;
+            }
+            else if(spare.isClicked(mouseX, mouseY)){endingState = 2;
+            map = -3;
+            }
         }
+    }
+    public void drawEndingDialogue(){
+        fill(255);
+        stroke(0);
+        strokeWeight(1);
+        rect(200, 432, 416, 96, 10);
+        fill(0);
+        text("Last Chow:", 220, 455);
+        text("Please spare me...\nMy nine brothers are already dead.\nIf I die, the sun will disappear forever.", 220, 477);
+        kill.draw();
+        spare.draw();
+        crow.draw();
     }
     public void shop(){
         if (shop == true){
@@ -170,7 +186,6 @@ public class MySketch extends PApplet{
     }
     
     public void drawShop(){
-        background(30);
         enhance.draw();
         textSize(30);
         fill(60,40,20);
@@ -182,18 +197,7 @@ public class MySketch extends PApplet{
         text("3. +2 DEF", 350, 280);
         text("Press V to exit", 350, 320);
     }
-    public void drawEndingDialogue(){
-        fill(255);
-        stroke(0);
-        strokeWeight(1);
-        rect(200, 432, 416, 96, 10);
-        fill(0);
-        text("Last Chow:", 220, 455);
-        text("Please spare me...\nMy nine brothers are already dead.\nIf I die, the sun will disappear forever.", 220, 477);
-        kill.draw();
-        spare.draw();
-        crow.draw();
-    }
+    
     
     public void drawMap(){
         user.draw();
@@ -227,10 +231,10 @@ public class MySketch extends PApplet{
         for (Monster m : monsters[map]){
             if (m != null && m.defeated == false){
                 if (!m.person.equals("Boss")){
-                noStroke();
-                fill(255, 80);
-                ellipse(m.x + 24, m.y + 24, 56, 56);
-                tint(220, 240, 255); 
+                    noStroke();
+                    fill(255, 80);
+                    ellipse(m.x + 24, m.y + 24, 56, 56);
+                    tint(220, 240, 255); 
                 }else{
                     tint(255);
                 }
