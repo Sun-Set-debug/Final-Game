@@ -6,7 +6,10 @@ package github.pkgfinal;
 import processing.core.PApplet;
 import processing.core.PImage;
 /**
- *
+ * Main game controller.
+ * Handles map loading, player movement, combat,
+ * interactions, UI display and game endings.
+ * 
  * @author fuche
  */
 public class MySketch extends PApplet{
@@ -36,10 +39,12 @@ public class MySketch extends PApplet{
     int map = -1;//main map
     int shopcost;
     PImage wallImg;
+    // Initialize window size
     @Override 
     public void settings(){
         size(672,528);
     }
+    // Initialize all game objects, maps and resources
     @Override 
     public void setup(){
         background(255);
@@ -67,6 +72,7 @@ public class MySketch extends PApplet{
         loadMap(2,"maps/map2.txt");
         loadMap(3,"maps/map3.txt");
     }
+    // Load map data from txt file into 2D character array
     public void loadMap(int mapIndex,String fileName){
 
         mapLines = loadStrings(fileName);
@@ -77,10 +83,12 @@ public class MySketch extends PApplet{
         mapData[mapIndex][i] = mapLines[i].toCharArray();
         }
     }
+    // Main game loop, updates game state every frame
     @Override
     public void draw(){
         if (timecount > 0) timecount--;
-        if (user.hp <= 0)map = -2;
+        if (user.hp <= 0){map = -2;
+        saveScore("GAME OVER");}
         fill(0);
         switch (map){
             case -1 -> {startButton.draw();
@@ -120,6 +128,7 @@ public class MySketch extends PApplet{
             }
         }
     }
+    // Detect mouse click for buttons, NPC dialogue and monster info
     @Override
     public void mousePressed(){
         if (map == -1){//main map
@@ -143,12 +152,15 @@ public class MySketch extends PApplet{
             System.out.println("dialog active");
             if (kill.isClicked(mouseX, mouseY)){endingState = 3;
             map = -3;
+            saveScore("Bad Ending");
             }
             else if(spare.isClicked(mouseX, mouseY)){endingState = 2;
             map = -3;
+            saveScore("Good Ending");
             }
         }
     }
+    // Display final choice dialogue after boss battle
     public void drawEndingDialogue(){
         fill(255);
         stroke(0);
@@ -161,6 +173,7 @@ public class MySketch extends PApplet{
         spare.draw();
         crow.draw();
     }
+    // Handle shop system and upgrading player stats
     public void shop(){
         if (shop == true){
             drawShop();
@@ -184,7 +197,7 @@ public class MySketch extends PApplet{
             timecount = 10;
         }
     }
-    
+    // Draw shop interface on screen
     public void drawShop(){
         enhance.draw();
         textSize(30);
@@ -197,15 +210,15 @@ public class MySketch extends PApplet{
         text("3. +2 DEF", 350, 280);
         text("Press V to exit", 350, 320);
     }
-    
-    
+    // Draw all game objects on current map
     public void drawMap(){
         user.draw();
+        // Check resource collection (keys, health items, stat items)
         for (Resource k: keys[map]){
             if (k != null && !k.picked){
                 k.draw();
                 if (k.isCollidingWithR(user)){
-                    k.pickUp(user);
+                    k.interact(user);
                     k.picked = true;
                 }
             }
@@ -214,7 +227,7 @@ public class MySketch extends PApplet{
             if (bl != null && !bl.picked){
                 bl.draw();
                 if (bl.isCollidingWithR(user)){
-                    bl.pickUp(user);
+                    bl.interact(user);
                     bl.picked = true;
                 }
             }
@@ -223,11 +236,29 @@ public class MySketch extends PApplet{
             if (pro != null && !pro.picked){
                 pro.draw();
                 if (pro.isCollidingWithR(user)){
-                    pro.pickUp(user);
+                    pro.interact(user);
                     pro.picked = true;
                 }
             }
         }
+        // Handle door interaction and map transition
+        for (Door door: doors[map]){
+            if (door != null && !door.passable && !door.doorType.equals("nextMap")){
+                door.draw();
+                if (door.isCollidingWithR(user)){
+                    door.interact(user);
+                }
+            }
+            if (door != null && door.doorType.equals("nextMap")){
+                door.draw();
+                if (door.isCollidingWithR(user)){
+                    map = door.mapChange;
+                    user.setSite(door.sx,door.sy);
+                    break;
+                }
+            }
+        }
+        // Draw monsters and trigger combat system
         for (Monster m : monsters[map]){
             if (m != null && m.defeated == false){
                 if (!m.person.equals("Boss")){
@@ -250,22 +281,7 @@ public class MySketch extends PApplet{
                 }
             } 
         }
-        for (Door door: doors[map]){
-            if (door != null && !door.passable && !door.doorType.equals("nextMap")){
-                door.draw();
-                if (door.isCollidingWithR(user)){
-                    door.open();
-                }
-            }
-            if (door != null && door.doorType.equals("nextMap")){
-                door.draw();
-                if (door.isCollidingWithR(user)){
-                    map = door.mapChange;
-                    user.setSite(door.sx,door.sy);
-                    break;
-                }
-            }
-        }
+        // Draw wall tiles based on map file
         for(int row=0;row<mapData[map].length;row++){
             for(int col=0;col<mapData[map][row].length;col++){
                 if(mapData[map][row][col]=='w'){
@@ -279,6 +295,7 @@ public class MySketch extends PApplet{
                 }
             }
         }
+        // Draw NPCs and display dialogue when clicked
         for (NPC npc: npcs[map]){
             if (npc != null){
                 npc.draw();
@@ -288,16 +305,25 @@ public class MySketch extends PApplet{
             }
         }
     }
+    /**
+    * Determines whether player can move to target tile.
+    *
+    * @param x destination x coordinate
+    * @param y destination y coordinate
+    * @return true if movement is valid
+    */
     public boolean canMove(int x, int y){
+        // Prevent player from moving out of window
         if (x < 144 || x >= 14 * 48 || y < 0 || y >= 11 * 48) {
             return false;
         }
         int col = (x - 144) / 48;
         int row = y / 48;
-
+        // Prevent player from moving through walls
         if(mapData[map][row][col] == 'w'){
             return false;
         }
+        // Prevent player from moving through NPCs
         for(NPC npc : npcs[map]){
             if(npc != null &&
                 npc.getX() == x &&
@@ -305,16 +331,18 @@ public class MySketch extends PApplet{
                 return false;
             }
         }
+        // Check door collision
         for(Door door : doors[map]){
             if(door != null &&
                 door.getX() == x &&
                 door.getY() == y){
-                door.open();
+                door.interact(user);
                 return door.passable;
             }
         }
         return true;
     }
+    // Handle keyboard movement input
     public void userMove(){
         if (keyPressed && timecount <= 0){
             switch (keyCode) {
@@ -352,12 +380,7 @@ public class MySketch extends PApplet{
             timecount = 10;
         }
     }
-    public void lose(){
-        background(0);
-        fill(255);
-        textSize(50);
-        text("GAME OVER",200,250);
-    }
+    // Display player stats on side UI panel
     public void information(){
         fill(0);
         UI.draw();
@@ -369,6 +392,7 @@ public class MySketch extends PApplet{
         text(Player.keyStone, 110, 280);
         text(Player.keyGold, 110, 310);
     }
+    // Initialize village map objects
     public void setUpMap0(){
         npcs[0][5] = new NPC(4,2,"Kevin", this, "images/npc.png", "Hou Yi's kindness can never be repaid!\n\\(^0^)/\\(^0^)/\\(^0^)/\\(^0^)/\\(^0^)/");
         npcs[0][0] = new NPC(4, 2, "Baicheng", this, "images/npc.png",
@@ -388,6 +412,7 @@ public class MySketch extends PApplet{
         property[0][1] = new Resource(7, 6, "defStone", this, "images/def.png", 1, "def");
         doors[0][0] = new Door(6, 0, "exit", this, "images/to.png", 6, 9, 1);
     }
+    // Initialize wild area map objects
     public void setUpMap1(){
         doors[1][0] = new Door(6,10,"return", this, "images/back.png", 6, 1, 0);
         npcs[1][0] = new NPC(7,8,"Logos", this, "images/npc.png", "Different obstacles require different \narrows to clear.");
@@ -423,6 +448,7 @@ public class MySketch extends PApplet{
         property[1][4] = new Resource(5, 1, "defStone", this, "images/def.png", 1, "def");
         doors [1][9] = new Door(1 ,0,"return", this, "images/to.png", 1, 9, 2);
     }
+    // Initialize mountain map objects
     public void setUpMap2(){
         doors [2][0] = new Door(1 ,10,"return", this, "images/back.png", 1, 1, 1);
         doors[2][1] = new Door(1,2,"stoneDoor", this, "images/stone.png", "Stone");
@@ -457,6 +483,7 @@ public class MySketch extends PApplet{
         property[2][5] = new Resource(9, 3, "defStone", this, "images/def.png", 2, "def");
         doors[2][6] = new Door(6 ,0,"return", this, "images/to.png", 6, 9, 3);
     }
+    // Initialize boss map objects
     public void setUpMap3(){
         doors[3][0] = new Door(6 ,10,"return", this, "images/back.png", 6, 1, 2);
         blood[3][0] = new Resource(7, 7, "yellowBlood", this, "images/BloodPro.png", 100, "hp");
@@ -472,6 +499,29 @@ public class MySketch extends PApplet{
         monsters[3][0] = new Monster(3,2,"Boss", this, "images/sunbird.png", 400,30,10,50);
         crow = new Person(5,3,"GoldenCrow",this,"images/defeatedBird.png");
     }
+    /**
+    * Saves player result and stats into an external file.
+    *
+    * @param result final game result
+    */
+    public void saveScore(String result){
+        String[] data = {
+            "Result: " + result,
+            "HP: " + user.hp,
+            "ATK: " + user.atk,
+            "DEF: " + user.def,
+            "Gold: " + Player.gold
+        };
+        saveStrings("score.txt", data);
+    }
+    // Display lose screen
+    public void lose(){
+        background(0);
+        fill(255);
+        textSize(50);
+        text("GAME OVER",200,250);
+    }
+    // Display good ending screen
     public void goodEnding(){
         background(0);
         fill(255);
@@ -486,6 +536,7 @@ public class MySketch extends PApplet{
             200
         );
     }
+    // Display bad ending screen
     public void badEnding(){
         background(0);
         fill(255);

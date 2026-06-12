@@ -1,0 +1,5 @@
+Result: Bad Ending
+HP: 550
+ATK: 21
+DEF: 12
+Gold: 56
